@@ -1,0 +1,21 @@
+Install VirtualBox(preferred version5)
+Install docker-machine or docker-toolbox whichever is applicable
+vboxmanage -version
+docker-machine create -d virtualbox manager
+docker-machine create -d virtualbox consul
+docker-machine create -d virtualbox agent1
+(If it asks to regenerate certs use docker-machine regenerate-certs 'name')
+docker-machine ls
+eval $(docker-machine env consul)
+docker run -d -p 8500:8500 --name=consul progrium/consul -server -bootstrap
+eval $(docker-machine env manager)
+docker run -d -p 3376:3376 -t -v /var/lib/boot2docker:/certs:ro swarm manage -H 0.0.0.0:3376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server.pem --tlskey=/certs/server-key.pem consul://192.168.99.101:8500
+eval $(docker-machine env agent1)
+docker run -d swarm join --addr=$(docker-machine ip agent1):2376 consul://192.168.99.101:8500
+DOCKER_HOST=$(docker-machine ip manager):3376
+docker info
+docker-machine create -d virtualbox agent2
+eval $(docker-machine env agent2)
+docker run -d swarm join --addr=$(docker-machine ip agent2):2376 consul://192.168.99.101:8500
+DOCKER_HOST=$(docker-machine ip manager):3376
+docker info
