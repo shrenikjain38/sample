@@ -10,11 +10,8 @@ docker-machine regenerate-certs agent2 -f
 eval $(docker-machine env consul)
 docker run -d -p 8500:8500 --name=consul progrium/consul -server -bootstrap
 eval $(docker-machine env manager)
-docker run -d -p 3376:3376 -t -v /var/lib/boot2docker:/certs:ro swarm manage -H 0.0.0.0:3376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server.pem --tlskey=/certs/server-key.pem consul://$(docker-machine ip consul):8500
+docker run -d -p 3376:3376 -t -v /var/lib/boot2docker:/certs:ro swarm manage -H 0.0.0.0:3376 --strategy=random --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server.pem --tlskey=/certs/server-key.pem consul://$(docker-machine ip consul):8500
 eval $(docker-machine env agent1)
 docker run -d swarm join --addr=$(docker-machine ip agent1):2376 consul://$(docker-machine ip consul):8500
 eval $(docker-machine env agent2)
 docker run -d swarm join --addr=$(docker-machine ip agent2):2376 consul://$(docker-machine ip consul):8500
-#run after script has finished executing
-#DOCKER_HOST=$(docker-machine ip manager):3376
-#docker info

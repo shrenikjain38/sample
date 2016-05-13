@@ -1,0 +1,2 @@
+Stop the swarm container on the manager
+Rerun swarm manage command with different value for strategy flag

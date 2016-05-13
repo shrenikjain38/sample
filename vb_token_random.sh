@@ -7,7 +7,9 @@ docker-machine create -d virtualbox agent2
 docker-machine regenerate-certs agent2 -f
 eval $(docker-machine env manager)
 token=$(docker run --rm swarm create)
-docker run -d -p 3376:3376 -t -v /var/lib/boot2docker:/certs:ro swarm manage -H 0.0.0.0:3376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server.pem --tlskey=/certs/server-key.pem token://$token
+echo "token ki value"
+echo $token
+docker run -d -p 3376:3376 -t -v /var/lib/boot2docker:/certs:ro swarm manage -H 0.0.0.0:3376 --strategy=random --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server.pem --tlskey=/certs/server-key.pem token://$token
 eval $(docker-machine env agent1)
 docker run -d swarm join --addr=$(docker-machine ip agent1):2376 token://$token
 eval $(docker-machine env agent2)
